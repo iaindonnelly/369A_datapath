@@ -53,10 +53,10 @@ module EX_MEM_Register( RegWrite_In,
                        MemToReg_In,
                        MemRead_In, 
                        MemWrite_In, 
-                       PCSrc_In, 
-                       AddResult_In,
+                     //  PCSrc_In, 
+                     //  AddResult_In,
                        ALUResult_In,
-                       Zero_In,
+                    //   Zero_In,
                        RT_In,
                        RegDest_In,
                        branchSel_In,
@@ -66,10 +66,10 @@ module EX_MEM_Register( RegWrite_In,
                        MemToReg_Out, 
                        MemRead_Out, 
                        MemWrite_Out, 
-                       PCSrc_Out, 
-                       AddResult_Out,
+                     //  PCSrc_Out, 
+                     //  AddResult_Out,
                        ALUResult_Out,
-                       Zero_Out,
+                      // Zero_Out,
                        RT_Out,
                        RegDest_Out,
                        branchSel_Out,
@@ -85,28 +85,28 @@ module EX_MEM_Register( RegWrite_In,
        //Mem Stage Signals
        input MemRead_In; 
        input MemWrite_In; 
-       input PCSrc_In; 
+    //   input PCSrc_In; 
        input [1:0] DM_Sel_In;
        
        output reg [1:0] DM_Sel_Out;
        output reg MemRead_Out;
        output reg MemWrite_Out; 
-       output reg PCSrc_Out; 
+   //    output reg PCSrc_Out; 
        
        input Clk; 
        
        //data lines
-       input [31:0] AddResult_In;
+       //input [31:0] AddResult_In;
        input [31:0] ALUResult_In;
        input [31:0] RT_In;
        input [4:0] RegDest_In;
-       input Zero_In;
+      // input Zero_In;
        
-       output reg [31:0] AddResult_Out;
+       //output reg [31:0] AddResult_Out;
        output reg [31:0] ALUResult_Out;
        output reg [31:0] RT_Out;
        output reg [4:0] RegDest_Out;
-       output reg Zero_Out;
+      // output reg Zero_Out;
                reg RegWrite; 
               reg MemToReg; 
               reg MemRead; 
@@ -124,7 +124,7 @@ module EX_MEM_Register( RegWrite_In,
               reg [31:0] Hi_Lo;
               reg [31:0] RT;
               reg [4:0] RegDest;
-              reg Zero;
+        //      reg Zero;
               reg [1:0] DM_Sel;
               reg branchSel;
               
@@ -146,15 +146,15 @@ module EX_MEM_Register( RegWrite_In,
        Hi_Lo <= 0;
        RT <= 0;
        RegDest <= 0;
-       Zero <= 0;
+       //Zero <= 0;
        MemRead_Out <= 0;
        MemWrite_Out <= 0; 
-       PCSrc_Out <= 0; 
-       AddResult_Out <=0;
+     //  PCSrc_Out <= 0; 
+      // AddResult_Out <=0;
        ALUResult_Out <= 0;
        RT_Out<=0;
        RegDest_Out<=0;
-       Zero_Out<=0;
+       //Zero_Out<=0;
        RegWrite_Out <=0; 
        MemToReg_Out <=0; 
        branchSel_Out <= 0;
@@ -171,12 +171,12 @@ module EX_MEM_Register( RegWrite_In,
        MemToReg <= MemToReg_In;
        MemRead <= MemRead_In;
        MemWrite <= MemWrite_In;
-       PCSrc <= PCSrc_In;
-       AddResult <= AddResult_In;
+     //  PCSrc <= PCSrc_In;
+      // AddResult <= AddResult_In;
        ALUResult <= ALUResult_In;
        RT <= RT_In;
        RegDest <= RegDest_In;
-       Zero <= Zero_In;
+       //Zero <= Zero_In;
        
         DM_Sel_Out = DM_Sel;
         branchSel_Out = branchSel;
@@ -184,12 +184,12 @@ module EX_MEM_Register( RegWrite_In,
          MemToReg_Out = MemToReg;
          MemRead_Out = MemRead;
          MemWrite_Out = MemWrite;
-         PCSrc_Out = PCSrc;
-         AddResult_Out = AddResult;
+      //   PCSrc_Out = PCSrc;
+       //  AddResult_Out = AddResult;
          ALUResult_Out = ALUResult;
          RT_Out = RT;
          RegDest_Out = RegDest;
-         Zero_Out = Zero;
+         //Zero_Out = Zero;
     end
 
 endmodule

@@ -61,11 +61,11 @@ module DataMemory(Address, WriteData, Clk, MemWrite, MemRead, ReadData);
     end
     always @(posedge Clk) begin
             if (MemWrite == 1'b1) begin         //checks for Memory Write signal from controller
-                // Address[1:0]^Instruction[31:30]?, need select signal for 
-               // if(Address[1:0] == 0) begin  memory[Address][7:0] <= WriteData; end
-              //  else if (Address[1:0] == 1) begin memory[Address][15:8] <= WriteData; end
-              //  else if (Address[1:0] == 2) begin memory[Address][23:16] <= WriteData; end 
-              //  else (Address[1:0] == 3) begin  memory[Address][31:24] <= WriteData; end 
+                
+               // if(Address[1:0] == 0) begin  memory[Address][7:0] <= WriteData[7:0]; end
+              //  else if (Address[1:0] == 1) begin memory[Address][15:8] <= WriteData[7:0]; end
+              //  else if (Address[1:0] == 2) begin memory[Address][23:16] <= WriteData[7:0]; end 
+              //  else (Address[1:0] == 3) begin  memory[Address][31:24] <= WriteData[7:0]; end 
                 memory[Address] <= WriteData; //sends data from register to memory address Address[11:2] 
             end
         end    

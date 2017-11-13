@@ -100,12 +100,8 @@ module DataPath(Rst, Clk,writeData,PCResultO);
           wire [31:0] JALAOut;
           wire branchSel_WB;
           wire [1:0] JSEl;
-          wire [1:0] JSEl_Out;
-  //  ClkDiv ClkDiv1(Clkin, 0, Clk);
-  //IF
   
-  
-   Mux32Bit2To1 PCSRC(Address, PCAddResult, AddResult_MEM, AndOut);   
+   Mux32Bit2To1 PCSRC(Address, PCAddResult, PC_Out, AndOut);   
   
    ProgramCounter PC(Address, PCResult, Rst, Clk); 
    
@@ -129,6 +125,22 @@ module DataPath(Rst, Clk,writeData,PCResultO);
   
   Controller Cont(InstructionOut[31:26],InstructionOut[5:0],ALUSrc,RegDst,RegWrite,ALUOp,MemRead,MemWrite,MemtoReg,Branch, ShiftOp,InstructionOut[21],InstructionOut[6],Hi_Write,Lo_Write,immUnsign,InstructionOut[20:16],branchRes,branchSel,DM_Sel_In,JSEl);
   
+  
+  ShiftLeft2 SHL2(SignOut,ShiftOut);
+     
+  Adder BranchADD(PCAddResultOut,ShiftOut,AdderOut); 
+  
+  SL2J SL22(InstructionOut[25:0],macaroni1out);
+
+  macaroniMux macaroniMux1(MMOut, AdderOut, macaroni1out, RS_Out , JSEl,PCAddResultOut[31:28]);//need to send in rs
+    
+  BranchComp BranchRes(
+       branchRes,
+       RS,
+       RT,
+       ZeroFlag 
+        );
+  
    ID_EX_Register ID_EX( RegWrite, 
                         MemtoReg,
                         MemRead, 
@@ -141,18 +153,16 @@ module DataPath(Rst, Clk,writeData,PCResultO);
                         Hi_Write,
                         Lo_Write,                     
                         immUnsign,
-                        PCAddResultOut,
+                        MMOut,
                         RS,
                         RT,
                         SignOut,
                         ZeroextOut,
                         InstructionOut[20:16],
                         InstructionOut[15:11],
-                        branchRes,
                         branchSel,
                         DM_Sel_In,
-                        InstructionOut,
-                        JSEl,
+                        ZeroFlag,
                         Clk, 
                         RegWrite_Out, 
                         MemToReg_Out, 
@@ -173,11 +183,9 @@ module DataPath(Rst, Clk,writeData,PCResultO);
                         Zero_Extend_Out,
                         RegDest1_Out,
                         RegDest2_Out,
-                        branchRes_Out,
                         branchSel_Out,
                         DM_Sel_Out,
-                        InstructionEX,
-                        JSEl_Out
+                        ZeroOut
                         );
                         
                        
@@ -189,34 +197,18 @@ module DataPath(Rst, Clk,writeData,PCResultO);
    Mux32Bit2To1 signed_unsigned(ALUIMM, Sign_Extend_Out, Zero_Extend_Out, ImUnsign_Out);
    
    Mux32to5 shamt_sel(ALUShamt, ALUIMM[10:6], RS_Out[4:0], ShiftOp_Out); 
-   
-   ShiftLeft2 SHL2(ALUIMM,ShiftOut);
-   
-   Adder BranchADD(PC_Out,ShiftOut,AdderOut); 
-   
+ 
    HiLoReg HILO( Hi_Write_Out, Lo_Write_Out, Clk, Hi_in, Lo_in, Hi,ALUResult); 
    
-   ALU32Bit ALU(ALUOp_Out, RS_Out, ALUB, ALUResult, Zero,ALUShamt,Hi,Hi_in,Lo_in);                 
+   ALU32Bit ALU(ALUOp_Out, RS_Out, ALUB, ALUResult, Zero,ALUShamt,Hi,Hi_in,Lo_in);              
    
-   SL2J SL22(InstructionEX[25:0],macaroni1out);
-   //concatenate with most pc + 4[31:28],
-   macaroniMux macaroniMux1(MMOut, AdderOut, macaroni1out, RS_Out , JSEl_Out,PC_Out[31:28]);//need to send in rs
-   
-   BranchComp BranchRes(
-      branchRes_Out,
-      RS_Out,
-      ALUB,
-      ZeroFlag 
-       
-       );
+   AndGate BranchAnd(PCSrc_Out,ZeroOut,AndOut);     
+
    EX_MEM_Register EX_MEM( RegWrite_Out, //missing zeroflag
                           MemToReg_Out,
                           MemRead_Out, 
                           MemWrite_Out, 
-                          PCSrc_Out, 
-                          MMOut,
                           ALUResult,
-                          ZeroFlag,
                           RT_Out,
                           REGDST,
                           branchSel_Out,
@@ -226,10 +218,7 @@ module DataPath(Rst, Clk,writeData,PCResultO);
                           MemToReg_MEM, 
                           MemRead_MEM, 
                           MemWrite_MEM, 
-                          PCSrc_MEM, 
-                          AddResult_MEM,
                           ALUResult_MEM,
-                          ZeroOut,
                           RT_MEM,
                           RegDest_MEM,
                           branchSel_MEM,
@@ -243,9 +232,7 @@ module DataPath(Rst, Clk,writeData,PCResultO);
     DataMemory DATAMem(ALUResult_MEM[11:2], DMWout, Clk, MemWrite_MEM, MemRead_MEM, ReadData_MEM); 
     
     Mux3to1signed DATAMEMR(DMRout,ReadData_MEM , DM_Sel_MEM);
-   //need to have signext after?
-    AndGate BranchAnd(PCSrc_MEM,ZeroOut,AndOut);  
-    
+ 
 MEM_WB_Register MEM_WB(       RegWrite_MEM,  
                            MemToReg_MEM,
                            DMRout,

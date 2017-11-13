@@ -68,11 +68,11 @@ module ID_EX_Register( RegWrite_In,
                        Zero_Extend_In,
                        RegDest1_In,
                        RegDest2_In,
-                       branchRes_In,
                        branchSel_In,
                        DM_Sel_In,
-                       Instruction_In,
-                       JSEl_In,
+                     //  Instruction_In,
+                       //JSEl_In,
+                       Zero_In,
                        Clk, 
                        RegWrite_Out, 
                        MemToReg_Out, 
@@ -93,11 +93,11 @@ module ID_EX_Register( RegWrite_In,
                        Zero_Extend_Out,
                        RegDest1_Out,
                        RegDest2_Out,
-                       branchRes_Out,
                        branchSel_Out,
                        DM_Sel_Out,
-                       Instruction_Out,
-                       JSEl_Out);
+                    //   Instruction_Out,
+                       Zero_Out);
+        //               JSEl_Out);
        //WB Stage Signals                
        input RegWrite_In;                
        input MemToReg_In;
@@ -115,29 +115,31 @@ module ID_EX_Register( RegWrite_In,
        output reg PCSrc_Out; 
        
        //EX Stage Signals
-       input [31:0] Instruction_In;
+       //input [31:0] Instruction_In;
        input ALUSrc_In;
        input RegDst_In;
        input ShiftOP_In;
        input Hi_Write_In;
        input Lo_Write_In;       
        input ImUnsign_In;
-       input [2:0] branchRes_In;
+      // input [2:0] branchRes_In;
        input branchSel_In;
        input [1:0] DM_Sel_In;
-       input [1:0] JSEl_In;
+    //   input [1:0] JSEl_In;
+       input Zero_In; 
        
        input [4:0] ALUOp_In;
        
-       output reg [1:0] JSEl_Out;
-       output reg [31:0] Instruction_Out;
+     //  output reg [1:0] JSEl_Out;
+       output reg Zero_Out;
+       //output reg [31:0] Instruction_Out;
        output reg ALUSrc_Out; 
        output reg RegDst_Out; 
        output reg ShiftOp_Out;
        output reg Hi_Write_Out;
        output reg Lo_Write_Out;    
        output reg ImUnsign_Out;
-       output reg [2:0] branchRes_Out;
+      // output reg [2:0] branchRes_Out;
        output reg branchSel_Out;
        output reg [1:0] DM_Sel_Out;
        
@@ -164,7 +166,7 @@ module ID_EX_Register( RegWrite_In,
    
    
   initial begin     
-      Instruction_Out <= 0;
+      //Instruction_Out <= 0;
        ALUSrc_Out <= 0; 
        RegDst_Out <= 0; 
        ShiftOp_Out <= 0;
@@ -183,16 +185,17 @@ module ID_EX_Register( RegWrite_In,
        PCSrc_Out <= 0; 
        RegWrite_Out <= 0; 
        MemToReg_Out <= 0; 
-       branchRes_Out  <= 0;
+       //branchRes_Out  <= 0;
        branchSel_Out <= 0;
        DM_Sel_Out <= 0;
-       JSEl_Out <= 0;
+       //JSEl_Out <= 0;
     end   
        
         
        always@(posedge Clk)begin
-       Instruction_Out <= Instruction_In;
-       branchRes_Out  <= branchRes_In;
+       Zero_Out <= Zero_In;
+       //Instruction_Out <= Instruction_In;
+       //branchRes_Out  <= branchRes_In;
        branchSel_Out <=  branchSel_In;
        DM_Sel_Out <= DM_Sel_In;
        RegWrite_Out <= RegWrite_In;
@@ -214,7 +217,7 @@ module ID_EX_Register( RegWrite_In,
        Zero_Extend_Out <= Zero_Extend_In;
        RegDest1_Out <= RegDest1_In;
        RegDest2_Out <= RegDest2_In;
-       JSEl_Out <= JSEl_In;
+       //JSEl_Out <= JSEl_In;
        end
 
 endmodule
