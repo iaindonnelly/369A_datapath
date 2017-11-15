@@ -10,7 +10,7 @@ module DataPath(Rst, Clk,writeData,PCResultO);
     
       
    
-   //need to make all shit  
+   
           output reg [31:0] writeData;
           wire [31:0] Address;
           wire  RegWrite; 
@@ -104,6 +104,7 @@ module DataPath(Rst, Clk,writeData,PCResultO);
           wire [1:0] ForwardB;
           wire [31:0] AluAin;
           wire [31:0] AluBin;
+          wire [31:0] Instruction_EX;
   
    Mux32Bit2To1 PCSRC(Address, PCAddResult, PC_Out, AndOut);   
   
@@ -167,6 +168,7 @@ module DataPath(Rst, Clk,writeData,PCResultO);
                         branchSel,
                         DM_Sel_In,
                         ZeroFlag,
+                        InstructionOut,
                         Clk, 
                         RegWrite_Out, 
                         MemToReg_Out, 
@@ -189,16 +191,19 @@ module DataPath(Rst, Clk,writeData,PCResultO);
                         RegDest2_Out,
                         branchSel_Out,
                         DM_Sel_Out,
-                        ZeroOut
+                        ZeroOut,
+                        Instruction_EX //lil bit waistful
                         );
                         
                        
-   //EX
-   ForwardingUnit FU(RegDest_MEM,RS_Out,RegDest_WB,RT_Out,RegWrite_Out,RegWrite_WB,ForwardA,ForwardB);
+   //EX                             //wrong because need to pass though rs , rt 
+   ForwardingUnit FU(RegDest_MEM,Instruction_EX[25:21],RegDest_WB,Instruction_EX[20:16],RegWrite_Out,RegWrite_WB,ForwardA,ForwardB);
    
    Mux5Bit2To1 RegDestination(REGDST, RegDest1_Out, RegDest2_Out, RegDst_Out);
    
-   Mux32Bit2To1 ALUsource(ALUB, RT_Out, ALUIMM, ALUSrc_Out);   
+   Mux32Bit3To1 ALUBmux(RT_Out,ALUResult_MEM,WriteData,AluBin, ForwardB);//
+   
+   Mux32Bit2To1 ALUsource(ALUB, AluBin, ALUIMM, ALUSrc_Out);   //
    
    Mux32Bit2To1 signed_unsigned(ALUIMM, Sign_Extend_Out, Zero_Extend_Out, ImUnsign_Out);
    
@@ -208,9 +213,7 @@ module DataPath(Rst, Clk,writeData,PCResultO);
     
    Mux32Bit3To1 ALUAmux(RS_Out,WriteData,ALUResult_MEM,AluAin, ForwardA); //forwarding muxes
     
-   Mux32Bit3To1 ALUBmux(ALUB,ALUResult_MEM,WriteData,AluBin, ForwardB);
-     
-   ALU32Bit ALU(ALUOp_Out, AluAin, AluBin, ALUResult, Zero,ALUShamt,Hi,Hi_in,Lo_in);  //change inputs            
+   ALU32Bit ALU(ALUOp_Out, AluAin, ALUB, ALUResult, Zero,ALUShamt,Hi,Hi_in,Lo_in);  //change inputs            
    
    AndGate BranchAnd(PCSrc_Out,ZeroOut,AndOut);     
 
@@ -219,7 +222,7 @@ module DataPath(Rst, Clk,writeData,PCResultO);
                           MemRead_Out, 
                           MemWrite_Out, 
                           ALUResult,
-                          AluBin, //dis
+                          AluBin, //dis RT_Out need different mux to determine B, alubmux needs to be input a to alusrc mux
                           REGDST,
                           branchSel_Out,
                           DM_Sel_Out,

@@ -36,7 +36,7 @@ module Mux32Bit3To1(inA,inB,inC,out, sel);
         else if (sel == 2'b01) begin
             out <= inB;
         end
-        else begin
+        else if(sel == 2'b10) begin
             out <= inC;
         end
     end 

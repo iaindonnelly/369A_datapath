@@ -73,6 +73,7 @@ module ID_EX_Register( RegWrite_In,
                      //  Instruction_In,
                        //JSEl_In,
                        Zero_In,
+                       Instruction_In,
                        Clk, 
                        RegWrite_Out, 
                        MemToReg_Out, 
@@ -96,7 +97,8 @@ module ID_EX_Register( RegWrite_In,
                        branchSel_Out,
                        DM_Sel_Out,
                     //   Instruction_Out,
-                       Zero_Out);
+                       Zero_Out,
+                       Instruction_Out);
         //               JSEl_Out);
        //WB Stage Signals                
        input RegWrite_In;                
@@ -115,14 +117,14 @@ module ID_EX_Register( RegWrite_In,
        output reg PCSrc_Out; 
        
        //EX Stage Signals
-       //input [31:0] Instruction_In;
+       input [31:0] Instruction_In;
        input ALUSrc_In;
        input RegDst_In;
        input ShiftOP_In;
        input Hi_Write_In;
        input Lo_Write_In;       
        input ImUnsign_In;
-      // input [2:0] branchRes_In;
+      //input [2:0] branchRes_In;
        input branchSel_In;
        input [1:0] DM_Sel_In;
     //   input [1:0] JSEl_In;
@@ -132,7 +134,7 @@ module ID_EX_Register( RegWrite_In,
        
      //  output reg [1:0] JSEl_Out;
        output reg Zero_Out;
-       //output reg [31:0] Instruction_Out;
+       output reg [31:0] Instruction_Out;
        output reg ALUSrc_Out; 
        output reg RegDst_Out; 
        output reg ShiftOp_Out;
@@ -166,7 +168,7 @@ module ID_EX_Register( RegWrite_In,
    
    
   initial begin     
-      //Instruction_Out <= 0;
+      Instruction_Out <= 0;
        ALUSrc_Out <= 0; 
        RegDst_Out <= 0; 
        ShiftOp_Out <= 0;
@@ -194,7 +196,7 @@ module ID_EX_Register( RegWrite_In,
         
        always@(posedge Clk)begin
        Zero_Out <= Zero_In;
-       //Instruction_Out <= Instruction_In;
+       Instruction_Out <= Instruction_In;
        //branchRes_Out  <= branchRes_In;
        branchSel_Out <=  branchSel_In;
        DM_Sel_Out <= DM_Sel_In;
