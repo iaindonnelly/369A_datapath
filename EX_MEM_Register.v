@@ -85,13 +85,12 @@ module EX_MEM_Register( RegWrite_In,
        //Mem Stage Signals
        input MemRead_In; 
        input MemWrite_In; 
-    //   input PCSrc_In; 
        input [1:0] DM_Sel_In;
        
        output reg [1:0] DM_Sel_Out;
        output reg MemRead_Out;
        output reg MemWrite_Out; 
-   //    output reg PCSrc_Out; 
+   
        
        input Clk; 
        
@@ -100,96 +99,36 @@ module EX_MEM_Register( RegWrite_In,
        input [31:0] ALUResult_In;
        input [31:0] RT_In;
        input [4:0] RegDest_In;
-      // input Zero_In;
-       
-       //output reg [31:0] AddResult_Out;
+
        output reg [31:0] ALUResult_Out;
        output reg [31:0] RT_Out;
        output reg [4:0] RegDest_Out;
       // output reg Zero_Out;
-               reg RegWrite; 
-              reg MemToReg; 
-              reg MemRead; 
-              reg MemWrite; 
-              reg PCSrc; 
-              reg ALUSrc; 
-              reg RegDst; 
-              reg ALUOp;
-              reg ShiftOp;
-              reg Hi_Write ;
-              reg Lo_Write;
-              reg ImUnsign;
-              reg [31:0] AddResult;
-              reg [31:0] ALUResult;
-              reg [31:0] Hi_Lo;
-              reg [31:0] RT;
-              reg [4:0] RegDest;
-        //      reg Zero;
-              reg [1:0] DM_Sel;
-              reg branchSel;
-              
     initial begin      
-       RegWrite <= 0; 
-       MemToReg <= 0; 
-       MemRead <= 0; 
-       MemWrite <= 0; 
-       PCSrc <= 0; 
-       ALUSrc <= 0; 
-       RegDst <= 0; 
-       ALUOp <= 0;
-       ShiftOp <= 0;
-       Hi_Write <= 0;
-       Lo_Write <= 0;
-       ImUnsign <= 0;
-       AddResult <= 0;
-       ALUResult <= 0;
-       Hi_Lo <= 0;
-       RT <= 0;
-       RegDest <= 0;
-       //Zero <= 0;
+       
        MemRead_Out <= 0;
        MemWrite_Out <= 0; 
-     //  PCSrc_Out <= 0; 
-      // AddResult_Out <=0;
        ALUResult_Out <= 0;
        RT_Out<=0;
        RegDest_Out<=0;
-       //Zero_Out<=0;
        RegWrite_Out <=0; 
        MemToReg_Out <=0; 
        branchSel_Out <= 0;
        DM_Sel_Out <= 0;
-       branchSel <= 0;
-       DM_Sel <= 0;
        end     
        
         
    always@(posedge Clk)begin
-       DM_Sel <= DM_Sel_In;
-       branchSel <= branchSel_In;
-       RegWrite <= RegWrite_In;
-       MemToReg <= MemToReg_In;
-       MemRead <= MemRead_In;
-       MemWrite <= MemWrite_In;
-     //  PCSrc <= PCSrc_In;
-      // AddResult <= AddResult_In;
-       ALUResult <= ALUResult_In;
-       RT <= RT_In;
-       RegDest <= RegDest_In;
-       //Zero <= Zero_In;
-       
-        DM_Sel_Out = DM_Sel;
-        branchSel_Out = branchSel;
-        RegWrite_Out = RegWrite;
-         MemToReg_Out = MemToReg;
-         MemRead_Out = MemRead;
-         MemWrite_Out = MemWrite;
-      //   PCSrc_Out = PCSrc;
-       //  AddResult_Out = AddResult;
-         ALUResult_Out = ALUResult;
-         RT_Out = RT;
-         RegDest_Out = RegDest;
-         //Zero_Out = Zero;
+
+        DM_Sel_Out = DM_Sel_In;
+        branchSel_Out = branchSel_In;
+        RegWrite_Out = RegWrite_In;
+         MemToReg_Out = MemToReg_In;
+         MemRead_Out = MemRead_In;
+         MemWrite_Out = MemWrite_In;
+         ALUResult_Out = ALUResult_In;
+         RT_Out = RT_In;
+         RegDest_Out = RegDest_In;
     end
 
 endmodule
