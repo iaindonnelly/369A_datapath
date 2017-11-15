@@ -100,6 +100,10 @@ module DataPath(Rst, Clk,writeData,PCResultO);
           wire [31:0] JALAOut;
           wire branchSel_WB;
           wire [1:0] JSEl;
+          wire [1:0] ForwardA;
+          wire [1:0] ForwardB;
+          wire [31:0] AluAin;
+          wire [31:0] AluBin;
   
    Mux32Bit2To1 PCSRC(Address, PCAddResult, PC_Out, AndOut);   
   
@@ -190,7 +194,9 @@ module DataPath(Rst, Clk,writeData,PCResultO);
                         
                        
    //EX
-   Mux5Bit2To1 RegDestination(REGDST, RegDest1_Out, RegDest2_Out, RegDst_Out);//excellent signal names, also should be 5bit 2 to 1,also broken?
+   ForwardingUnit FU(RegDest_MEM,RS_Out,RegDest_WB,RT_Out,RegWrite_Out,RegWrite_WB,ForwardA,ForwardB);
+   
+   Mux5Bit2To1 RegDestination(REGDST, RegDest1_Out, RegDest2_Out, RegDst_Out);
    
    Mux32Bit2To1 ALUsource(ALUB, RT_Out, ALUIMM, ALUSrc_Out);   
    
@@ -198,9 +204,13 @@ module DataPath(Rst, Clk,writeData,PCResultO);
    
    Mux32to5 shamt_sel(ALUShamt, ALUIMM[10:6], RS_Out[4:0], ShiftOp_Out); 
  
-   HiLoReg HILO( Hi_Write_Out, Lo_Write_Out, Clk, Hi_in, Lo_in, Hi,ALUResult); 
-   
-   ALU32Bit ALU(ALUOp_Out, RS_Out, ALUB, ALUResult, Zero,ALUShamt,Hi,Hi_in,Lo_in);              
+   HiLoReg HILO( Hi_Write_Out, Lo_Write_Out, Clk, Hi_in, Lo_in, Hi,ALUResult);
+    
+   Mux32Bit3To1 ALUAmux(RS_Out,WriteData,ALUResult_MEM,AluAin, ForwardA); //forwarding muxes
+    
+   Mux32Bit3To1 ALUBmux(ALUB,ALUResult_MEM,WriteData,AluBin, ForwardB);
+     
+   ALU32Bit ALU(ALUOp_Out, AluAin, AluBin, ALUResult, Zero,ALUShamt,Hi,Hi_in,Lo_in);  //change inputs            
    
    AndGate BranchAnd(PCSrc_Out,ZeroOut,AndOut);     
 
@@ -209,7 +219,7 @@ module DataPath(Rst, Clk,writeData,PCResultO);
                           MemRead_Out, 
                           MemWrite_Out, 
                           ALUResult,
-                          RT_Out,
+                          AluBin, //dis
                           REGDST,
                           branchSel_Out,
                           DM_Sel_Out,

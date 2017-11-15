@@ -59,7 +59,8 @@ module ForwardingUnit(RD_MEM,RS_EX,RD_WB,RT_EX,RegWrite_EX,RegWrite_WB,ForwardA,
         output reg [1:0] ForwardB;
         
     always @(*) begin 
-    
+            ForwardA <= 2'b00;
+            ForwardB <= 2'b00;
           if (RegWrite_EX && (RD_MEM != 0)
           && (RD_MEM == RS_EX)) begin 
             ForwardA = 2'b10;
@@ -81,6 +82,8 @@ module ForwardingUnit(RD_MEM,RS_EX,RD_WB,RT_EX,RegWrite_EX,RegWrite_WB,ForwardA,
           && (RD_WB == RT_EX)) begin 
             ForwardB = 2'b01;
           end
+          
+          
           end
     end
 
