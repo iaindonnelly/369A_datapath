@@ -36,9 +36,9 @@
 // of the "Address" input to index any of the 256 words. 
 ////////////////////////////////////////////////////////////////////////////////
 
-module DataMemory(Address, WriteData, Clk, MemWrite, MemRead, ReadData); 
-
-    input [9:0] Address; 	// Input Address 
+module DataMemory(Address, WriteData, Clk, MemWrite, MemRead, ReadData,DM_SEL); 
+    input [1:0] DM_SEL;
+    input [11:0] Address; 	// Input Address 
     input [31:0] WriteData; // Data that needs to be written into the address 
     input Clk;
     input MemWrite; 		// Control signal for memory write 
@@ -61,18 +61,30 @@ module DataMemory(Address, WriteData, Clk, MemWrite, MemRead, ReadData);
     end
     always @(posedge Clk) begin
             if (MemWrite == 1'b1) begin         //checks for Memory Write signal from controller
+                if(DM_SEL == 2'b00) begin
+                    memory[Address[11:2]] <= WriteData;
+                end
+                else if(DM_SEL == 2'b01) begin
+                    if(Address[1:0] == 0) begin  memory[Address][15:0] <= WriteData[15:0]; end
+                    else if (Address[1:0] == 1) begin memory[Address][31:16] <= WriteData[15:0]; end
+                end
+                else if(DM_SEL == 2'b10) begin
                 
-               // if(Address[1:0] == 0) begin  memory[Address][7:0] <= WriteData[7:0]; end
-              //  else if (Address[1:0] == 1) begin memory[Address][15:8] <= WriteData[7:0]; end
-              //  else if (Address[1:0] == 2) begin memory[Address][23:16] <= WriteData[7:0]; end 
-              //  else (Address[1:0] == 3) begin  memory[Address][31:24] <= WriteData[7:0]; end 
-                memory[Address] <= WriteData; //sends data from register to memory address Address[11:2] 
+                    if(Address[1:0] == 2'b00) begin  memory[Address][7:0] <= WriteData[7:0]; end
+                    else if(Address[1:0] == 2'b01) begin memory[Address[11:2]][15:8] <= WriteData[7:0]; end
+                    else if(Address[1:0] == 2'b10) begin memory[Address[11:2]][23:16] <= WriteData[7:0]; end 
+                    else if(Address[1:0] == 2'b11) begin  memory[Address[11:2]][31:24] <= WriteData[7:0]; end 
+                    
+                end
+                else begin 
+                    memory[Address[11:2]] <= WriteData; //sends data from register to memory address Address[11:2] 
+                end
             end
         end    
         
     always @(*) begin
             if (MemRead == 1'b1) begin          //checks Mread memory flag from controller
-                    ReadData <= memory[Address];  //sends data stored at memory address Address[11:2] to the output mux
+                    ReadData <= memory[Address[11:2]];  //sends data stored at memory address Address[11:2] to the output mux
             end
             else
                     ReadData <= 32'h0;    //sets Data Memory output to mux to zero if Memory read flag is not 1

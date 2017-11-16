@@ -105,13 +105,18 @@ module DataPath(Rst, Clk,writeData,PCResultO);
           wire [31:0] AluAin;
           wire [31:0] AluBin;
           wire [31:0] Instruction_EX;
+          wire FlushID;
+          wire FlushEX;
+          wire FlushIF;
+          wire ContFlush;
+          wire IDFlush;
   
    Mux32Bit2To1 PCSRC(Address, PCAddResult, PC_Out, AndOut);   
   
    ProgramCounter PC(Address, PCResult, Rst, Clk); 
    
   InstructionMemory IS(PCResult[11:2], Instruction);   
-  
+  //need to stall pcadder
   PCAdder PCA(PCResult, PCAddResult);
   
   IF_ID_Register IF_ID(Instruction, PCAddResult, Clk, PCAddResultOut, InstructionOut);
@@ -125,11 +130,12 @@ module DataPath(Rst, Clk,writeData,PCResultO);
   RegisterFile Regs(InstructionOut[25:21], InstructionOut[20:16], JALMout, WriteDataMout, RegWrite_WB, Clk, RS, RT); //regwrite
   
   SignExtension SE(InstructionOut[15:0], SignOut);
- 
-  ZeroExtension ZE(InstructionOut[15:0], ZeroextOut); //why is vivado autistic?
   
-  Controller Cont(InstructionOut[31:26],InstructionOut[5:0],ALUSrc,RegDst,RegWrite,ALUOp,MemRead,MemWrite,MemtoReg,Branch, ShiftOp,InstructionOut[21],InstructionOut[6],Hi_Write,Lo_Write,immUnsign,InstructionOut[20:16],branchRes,branchSel,DM_Sel_In,JSEl);
+  ZeroExtension ZE(InstructionOut[15:0], ZeroextOut); 
   
+  Controller Cont(InstructionOut[31:26],InstructionOut[5:0],ALUSrc,RegDst,RegWrite,ALUOp,MemRead,MemWrite,MemtoReg,Branch, ShiftOp,InstructionOut[21],InstructionOut[6],Hi_Write,Lo_Write,immUnsign,InstructionOut[20:16],branchRes,branchSel,DM_Sel_In,JSEl,ContFlush);
+  
+  HazardDetection(InstructionOut,RegDest1_Out,FlushID,FlushIF,FlushEX); //need to fill in correct values;
   
   ShiftLeft2 SHL2(SignOut,ShiftOut);
      
@@ -145,6 +151,8 @@ module DataPath(Rst, Clk,writeData,PCResultO);
        RT,
        ZeroFlag 
         );
+        
+     OR FLUSHOR(FlushID,ContFlush,IDFlush);
   
    ID_EX_Register ID_EX( RegWrite, 
                         MemtoReg,
@@ -192,7 +200,8 @@ module DataPath(Rst, Clk,writeData,PCResultO);
                         branchSel_Out,
                         DM_Sel_Out,
                         ZeroOut,
-                        Instruction_EX //lil bit waistful
+                        Instruction_EX,
+                        IDFlush
                         );
                         
                        
@@ -217,6 +226,7 @@ module DataPath(Rst, Clk,writeData,PCResultO);
    
    AndGate BranchAnd(PCSrc_Out,ZeroOut,AndOut);     
 
+
    EX_MEM_Register EX_MEM( RegWrite_Out, //missing zeroflag
                           MemToReg_Out,
                           MemRead_Out, 
@@ -235,14 +245,15 @@ module DataPath(Rst, Clk,writeData,PCResultO);
                           RT_MEM,
                           RegDest_MEM,
                           branchSel_MEM,
-                          DM_Sel_MEM
+                          DM_Sel_MEM,
+                          FlushEX
                           );
  
 //MEM 
     //need to add 3 to 1 mux 
     Mux3to1 DATAMEMW(DMWout, RT_MEM, DM_Sel_MEM);
     
-    DataMemory DATAMem(ALUResult_MEM[11:2], DMWout, Clk, MemWrite_MEM, MemRead_MEM, ReadData_MEM); 
+    DataMemory DATAMem(ALUResult_MEM[11:0], DMWout, Clk, MemWrite_MEM, MemRead_MEM, ReadData_MEM,DM_Sel_MEM); 
     
     Mux3to1signed DATAMEMR(DMRout,ReadData_MEM , DM_Sel_MEM);
  

@@ -29,7 +29,7 @@ module Mux32Bit3To1(inA,inB,inC,out, sel);
     input [31:0] inC;
     input [1:0] sel;
     
-    always@(sel, inA, inB) begin
+    always@(*) begin
         if (sel == 2'b00) begin // changed
             out <= inA;
         end
@@ -39,6 +39,7 @@ module Mux32Bit3To1(inA,inB,inC,out, sel);
         else if(sel == 2'b10) begin
             out <= inC;
         end
+        else begin out <= inA; end
     end 
 
 endmodule

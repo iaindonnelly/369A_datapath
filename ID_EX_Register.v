@@ -98,11 +98,13 @@ module ID_EX_Register( RegWrite_In,
                        DM_Sel_Out,
                     //   Instruction_Out,
                        Zero_Out,
-                       Instruction_Out);
+                       Instruction_Out,
+                       Flush);
         //               JSEl_Out);
        //WB Stage Signals                
        input RegWrite_In;                
        input MemToReg_In;
+       input Flush;
        
        output reg RegWrite_Out; 
        output reg MemToReg_Out; 
@@ -195,6 +197,30 @@ module ID_EX_Register( RegWrite_In,
        
         
        always@(posedge Clk)begin
+       if (Flush == 1) begin
+       Instruction_Out <= 0;
+          ALUSrc_Out <= 0; 
+          RegDst_Out <= 0; 
+          ShiftOp_Out <= 0;
+          Hi_Write_Out<= 0;
+          Lo_Write_Out<= 0;    
+          ImUnsign_Out<= 0;
+          PC_Out <= 0;
+          RS_Out<= 0;
+          RT_Out<= 0;
+          Sign_Extend_Out<= 0;
+          Zero_Extend_Out<= 0;
+          RegDest1_Out<= 0;
+          RegDest2_Out<= 0;
+          MemRead_Out <= 0;
+          MemWrite_Out <= 0; 
+          PCSrc_Out <= 0; 
+          RegWrite_Out <= 0; 
+          MemToReg_Out <= 0; 
+          branchSel_Out <= 0;
+          DM_Sel_Out <= 0;
+       end
+       else begin
        Zero_Out <= Zero_In;
        Instruction_Out <= Instruction_In;
        //branchRes_Out  <= branchRes_In;
@@ -220,6 +246,7 @@ module ID_EX_Register( RegWrite_In,
        RegDest1_Out <= RegDest1_In;
        RegDest2_Out <= RegDest2_In;
        //JSEl_Out <= JSEl_In;
+       end
        end
 
 endmodule

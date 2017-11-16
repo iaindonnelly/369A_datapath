@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 11/13/2017 01:44:16 PM
+// Create Date: 11/15/2017 05:03:10 PM
 // Design Name: 
-// Module Name: HazardDetection
+// Module Name: OR
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,10 +20,11 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module HazardDetection(Instruction,RT_EX,FlushID,FlushIF,FlushEX); //also need ex stage mem control signals
-    input [31:0] Instruction;
-    input [4:0] RT_EX;
-    output reg FlushID;
-    output reg FlushIF;
-    output reg FlushEX;
+module OR(A,B,C);
+    
+    input A,B;
+    output reg C; 
+    always@(*) begin
+        C <= A|B;
+    end
 endmodule

@@ -49,10 +49,10 @@
 // to allow for data multiplexing and setup time.
 ////////////////////////////////////////////////////////////////////////////////
 
-module IF_ID_Register(Instr_In, PC_In, Clk, PC_Out, Instr_Out);//need control signal for hazard
+module IF_ID_Register(Instr_In, PC_In, Clk, PC_Out, Instr_Out,Flush,stall);//need control signal for hazard
        input [31:0]Instr_In;
        input [31:0]PC_In;
-    
+       input Flush,stall;
        input Clk;
 
         reg [31:0] Instr;
@@ -68,10 +68,18 @@ module IF_ID_Register(Instr_In, PC_In, Clk, PC_Out, Instr_Out);//need control si
       end
   
        always@(posedge Clk)begin 
-              PC <= PC_In;
-              Instr <= Instr_In;
-              Instr_Out <= Instr;
-              PC_Out <= PC;
+              if(Flush == 1) begin
+                  PC <= 0;
+                  Instr <= 0;
+              end
+              else begin
+                  if (stall == 0) begin
+                      PC <= PC_In;
+                      Instr <= Instr_In;
+                  end
+                      Instr_Out <= Instr;
+                      PC_Out <= PC;
+              end
        end
    
 endmodule
