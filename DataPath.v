@@ -113,9 +113,9 @@ module DataPath(Rst, Clk,writeData,PCResultO);
           wire ForwardA_ID;
           wire ForwardB_ID;
           wire Forward_MEM;
-          wire RS_F;
-          wire RT_F;
-          wire RT_MEM_F;
+          wire [31:0] RS_F;
+          wire [31:0] RT_F;
+          wire [31:0] RT_MEM_F;
           
    Mux32Bit2To1 PCSRC(Address, PCAddResult, PC_Out, AndOut);   
   
@@ -125,9 +125,9 @@ module DataPath(Rst, Clk,writeData,PCResultO);
   //need to stall pcadder
   PCAdder PCA(PCResult, PCAddResult);
   
-  IF_ID_Register IF_ID(Instruction, PCAddResult, Clk, PCAddResultOut, InstructionOut,stall);
+  IF_ID_Register IF_ID(Instruction, PCAddResult, Clk, PCAddResultOut, InstructionOut,ContFlush,stall);
   //Decode
-  PCAdder JALADD(PCAddResultOut,JALAOut); //gon need new adder
+  PCAdder JALADD(PCAddResultOut,JALAOut);
   //need to route select signal thorugh mem_wb                    bran
   Mux32Bit2To1 WriteDataM(WriteDataMout, WriteData , JALAOut , branchSel_WB);
     
@@ -140,8 +140,8 @@ module DataPath(Rst, Clk,writeData,PCResultO);
   ZeroExtension ZE(InstructionOut[15:0], ZeroextOut); 
   
   Controller Cont(InstructionOut[31:26],InstructionOut[5:0],ALUSrc,RegDst,RegWrite,ALUOp,MemRead,MemWrite,MemtoReg,Branch, ShiftOp,InstructionOut[21],InstructionOut[6],Hi_Write,Lo_Write,immUnsign,InstructionOut[20:16],branchRes,branchSel,DM_Sel_In,JSEl,ContFlush);
-  
-  HazardDetection(InstructionOut,RegDest1_Out,FlushID,FlushIF,stall); //need to fill in correct values;
+  // HazardDetection(Instruction,RD_EX,RT_ID,RS_ID,FlushID,FlushIF,stall,MemRead_EX)
+  HazardDetection HazardUnit(InstructionOut,REGDST,InstructionOut[25:21], InstructionOut[20:16],FlushID,FlushIF,stall,MemRead_Out); //need to fill in correct values;
   
   ShiftLeft2 SHL2(SignOut,ShiftOut);
      
@@ -262,9 +262,9 @@ module DataPath(Rst, Clk,writeData,PCResultO);
 //MEM 
     //need to add 3 to 1 mux 
     Mux32Bit2To1 FORWARD_MEM(RT_MEM_F, RT_MEM, WriteData, Forward_MEM);
-    
+    // Mux3to1(out, inA, sel)
     Mux3to1 DATAMEMW(DMWout, RT_MEM_F, DM_Sel_MEM);
-    
+          //DataMemory(Address, WriteData, Clk, MemWrite, MemRead, ReadData,DM_SEL)
     DataMemory DATAMem(ALUResult_MEM[11:0], DMWout, Clk, MemWrite_MEM, MemRead_MEM, ReadData_MEM,DM_Sel_MEM); 
     
     Mux3to1signed DATAMEMR(DMRout,ReadData_MEM , DM_Sel_MEM);

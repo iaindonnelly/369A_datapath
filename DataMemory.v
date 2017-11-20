@@ -65,12 +65,12 @@ module DataMemory(Address, WriteData, Clk, MemWrite, MemRead, ReadData,DM_SEL);
                     memory[Address[11:2]] <= WriteData;
                 end
                 else if(DM_SEL == 2'b01) begin
-                    if(Address[1:0] == 0) begin  memory[Address][15:0] <= WriteData[15:0]; end
-                    else if (Address[1:0] == 1) begin memory[Address][31:16] <= WriteData[15:0]; end
+                    if(Address[1:0] == 0) begin  memory[Address[11:2]][15:0] <= WriteData[15:0]; end
+                    else if (Address[1:0] == 1) begin memory[Address[11:2]][31:16] <= WriteData[15:0]; end
                 end
                 else if(DM_SEL == 2'b10) begin
                 
-                    if(Address[1:0] == 2'b00) begin  memory[Address][7:0] <= WriteData[7:0]; end
+                    if(Address[1:0] == 2'b00) begin  memory[Address[11:2]][7:0] <= WriteData[7:0]; end
                     else if(Address[1:0] == 2'b01) begin memory[Address[11:2]][15:8] <= WriteData[7:0]; end
                     else if(Address[1:0] == 2'b10) begin memory[Address[11:2]][23:16] <= WriteData[7:0]; end 
                     else if(Address[1:0] == 2'b11) begin  memory[Address[11:2]][31:24] <= WriteData[7:0]; end 
