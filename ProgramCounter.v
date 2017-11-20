@@ -25,10 +25,10 @@
 // location, 0x00000000H).
 ////////////////////////////////////////////////////////////////////////////////
 
-module ProgramCounter(Address, PCResult, Reset, Clk);
+module ProgramCounter(Address, PCResult, Reset, Clk,stall);
 
 	input [31:0] Address;
-	input Reset, Clk;
+	input Reset, Clk,stall;
 
 	output reg [31:0] PCResult;
         initial begin 
@@ -39,7 +39,11 @@ module ProgramCounter(Address, PCResult, Reset, Clk);
             PCResult <= 0;
             end
             else begin 
-            PCResult <= Address;
+                if(stall) begin //will this work?
+                end 
+                else begin 
+                PCResult <= Address;
+                end
             end
         end 
     /* Please fill in the implementation here... */

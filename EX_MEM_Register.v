@@ -53,8 +53,6 @@ module EX_MEM_Register( RegWrite_In,
                        MemToReg_In,
                        MemRead_In, 
                        MemWrite_In, 
-                     //  PCSrc_In, 
-                     //  AddResult_In,
                        ALUResult_In,
                     //   Zero_In,
                        RT_In,
@@ -66,17 +64,13 @@ module EX_MEM_Register( RegWrite_In,
                        MemToReg_Out, 
                        MemRead_Out, 
                        MemWrite_Out, 
-                     //  PCSrc_Out, 
-                     //  AddResult_Out,
                        ALUResult_Out,
                       // Zero_Out,
                        RT_Out,
                        RegDest_Out,
                        branchSel_Out,
-                       DM_Sel_Out,
-                       Flush);
-       //WB Stage Signals    
-       input Flush;          
+                       DM_Sel_Out);
+       //WB Stage Signals           
        input RegWrite_In;                
        input MemToReg_In;
        input branchSel_In;
@@ -121,18 +115,7 @@ module EX_MEM_Register( RegWrite_In,
        
         
    always@(posedge Clk)begin
-        if(Flush == 1) begin
-               MemRead_Out <= 0;
-               MemWrite_Out <= 0; 
-               ALUResult_Out <= 0;
-               RT_Out<=0;
-               RegDest_Out<=0;
-               RegWrite_Out <=0; 
-               MemToReg_Out <=0; 
-               branchSel_Out <= 0;
-               DM_Sel_Out <= 0;
-        end
-        else begin
+   
              DM_Sel_Out = DM_Sel_In;
              branchSel_Out = branchSel_In;
              RegWrite_Out = RegWrite_In;
@@ -142,7 +125,6 @@ module EX_MEM_Register( RegWrite_In,
              ALUResult_Out = ALUResult_In;
              RT_Out = RT_In;
              RegDest_Out = RegDest_In;
-         end
     end
 
 endmodule

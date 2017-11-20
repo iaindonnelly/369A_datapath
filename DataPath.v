@@ -106,22 +106,25 @@ module DataPath(Rst, Clk,writeData,PCResultO);
           wire [31:0] AluBin;
           wire [31:0] Instruction_EX;
           wire FlushID;
-          wire FlushEX;
           wire FlushIF;
           wire ContFlush;
           wire IDFlush;
+          wire stall;
+          wire ForwardA_ID;
+          wire ForwardB_ID;
+          wire Forward_MEM;
   
    Mux32Bit2To1 PCSRC(Address, PCAddResult, PC_Out, AndOut);   
   
-   ProgramCounter PC(Address, PCResult, Rst, Clk); 
+   ProgramCounter PC(Address, PCResult, Rst, Clk,stall); 
    
   InstructionMemory IS(PCResult[11:2], Instruction);   
   //need to stall pcadder
   PCAdder PCA(PCResult, PCAddResult);
   
-  IF_ID_Register IF_ID(Instruction, PCAddResult, Clk, PCAddResultOut, InstructionOut);
+  IF_ID_Register IF_ID(Instruction, PCAddResult, Clk, PCAddResultOut, InstructionOut,stall);
   //Decode
-  PCAdder JALADD(PCAddResultOut,JALAOut); 
+  PCAdder JALADD(PCAddResultOut,JALAOut); //gon need new adder
   //need to route select signal thorugh mem_wb                    bran
   Mux32Bit2To1 WriteDataM(WriteDataMout, WriteData , JALAOut , branchSel_WB);
     
@@ -135,7 +138,7 @@ module DataPath(Rst, Clk,writeData,PCResultO);
   
   Controller Cont(InstructionOut[31:26],InstructionOut[5:0],ALUSrc,RegDst,RegWrite,ALUOp,MemRead,MemWrite,MemtoReg,Branch, ShiftOp,InstructionOut[21],InstructionOut[6],Hi_Write,Lo_Write,immUnsign,InstructionOut[20:16],branchRes,branchSel,DM_Sel_In,JSEl,ContFlush);
   
-  HazardDetection(InstructionOut,RegDest1_Out,FlushID,FlushIF,FlushEX); //need to fill in correct values;
+  HazardDetection(InstructionOut,RegDest1_Out,FlushID,FlushIF,stall); //need to fill in correct values;
   
   ShiftLeft2 SHL2(SignOut,ShiftOut);
      
@@ -205,8 +208,9 @@ module DataPath(Rst, Clk,writeData,PCResultO);
                         );
                         
                        
-   //EX                             //wrong because need to pass though rs , rt 
-   ForwardingUnit FU(RegDest_MEM,Instruction_EX[25:21],RegDest_WB,Instruction_EX[20:16],RegWrite_Out,RegWrite_WB,ForwardA,ForwardB);
+   //EX                             
+   //ForwardingUnitEX(RD_MEM,RS_EX,RD_WB,RT_EX,RegWrite_EX,RegWrite_WB,ForwardA,ForwardB,RegWrite_MEM,ForwardA_ID,ForwardB_ID,RT_ID,RS_ID,MemWrite_MEM,Forward_MEM)
+   ForwardingUnitEX FU(RegDest_MEM,Instruction_EX[25:21],RegDest_WB,Instruction_EX[20:16],RegWrite_Out,RegWrite_WB,ForwardA,ForwardB,RegWrite_MEM,ForwardA_ID,ForwardB_ID,InstructionOut[20:16],InstructionOut[25:21],MemWrite_MEM,Forward_MEM);
    
    Mux5Bit2To1 RegDestination(REGDST, RegDest1_Out, RegDest2_Out, RegDst_Out);
    
@@ -245,8 +249,7 @@ module DataPath(Rst, Clk,writeData,PCResultO);
                           RT_MEM,
                           RegDest_MEM,
                           branchSel_MEM,
-                          DM_Sel_MEM,
-                          FlushEX
+                          DM_Sel_MEM
                           );
  
 //MEM 

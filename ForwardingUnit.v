@@ -47,7 +47,7 @@
 
 
 */
-module ForwardingUnit(RD_MEM,RS_EX,RD_WB,RT_EX,RegWrite_EX,RegWrite_WB,ForwardA,ForwardB);
+module ForwardingUnitEX(RD_MEM,RS_EX,RD_WB,RT_EX,RegWrite_EX,RegWrite_WB,ForwardA,ForwardB,RegWrite_MEM,ForwardA_ID,ForwardB_ID,RT_ID,RS_ID,MemWrite_MEM,Forward_MEM);
 
         input [4:0] RD_MEM;
         input [4:0] RS_EX;
@@ -55,13 +55,23 @@ module ForwardingUnit(RD_MEM,RS_EX,RD_WB,RT_EX,RegWrite_EX,RegWrite_WB,ForwardA,
         input [4:0] RT_EX;
         input RegWrite_EX;
         input RegWrite_WB;
+        input RegWrite_MEM;
+        input [4:0] RT_ID;
+        input [4:0] RS_ID;
+        input MemWrite_MEM;
+        
         output reg [1:0] ForwardA;
         output reg [1:0] ForwardB;
+        output reg ForwardA_ID;
+        output reg ForwardB_ID;
+        output reg Forward_MEM;
         
     always @(*) begin 
             ForwardA <= 2'b00;
             ForwardB <= 2'b00;
-          if (RegWrite_EX && (RD_MEM != 0)
+            
+          if (RegWrite_EX 
+          && (RD_MEM != 0)
           && (RD_MEM == RS_EX)) begin 
             ForwardA = 2'b10;
           end
@@ -71,18 +81,32 @@ module ForwardingUnit(RD_MEM,RS_EX,RD_WB,RT_EX,RegWrite_EX,RegWrite_WB,ForwardA,
           && (RD_MEM == RT_EX)) begin
             ForwardB = 2'b10;
           
-          if (RegWrite_WB
+          if (RegWrite_WB //wb -> ex
           && (RD_WB !=  0)
-          && (RD_WB == RS_EX)) begin 
+          && (RD_WB == RS_EX) && (~(RegWrite_MEM && (RD_MEM != 0) && (RD_MEM != RS_EX)))) begin 
             ForwardA = 2'b01;
           end
            
           if (RegWrite_WB
           && (RD_WB !=  0)
-          && (RD_WB == RT_EX)) begin 
+          && (RD_WB == RT_EX) && (~(RegWrite_MEM && (RD_MEM != 0) && (RD_MEM != RT_EX)))) begin 
             ForwardB = 2'b01;
           end
           
+          if ((RD_MEM == RS_ID) && (RegWrite_MEM)//might need additional logic
+          && (RD_MEM != 0)) begin
+          ForwardA_ID = 1;
+          end
+          
+           if ((RD_MEM == RT_ID) && (RegWrite_MEM)
+           && (RD_MEM != 0)) begin
+           ForwardB_ID = 1;
+           end
+           
+           if ((RD_WB == RD_MEM) && (MemWrite_MEM == 1)
+           && (RD_WB != 0)) begin
+           Forward_MEM = 1;
+           end
           
           end
     end
