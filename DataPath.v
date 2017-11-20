@@ -113,7 +113,10 @@ module DataPath(Rst, Clk,writeData,PCResultO);
           wire ForwardA_ID;
           wire ForwardB_ID;
           wire Forward_MEM;
-  
+          wire RS_F;
+          wire RT_F;
+          wire RT_MEM_F;
+          
    Mux32Bit2To1 PCSRC(Address, PCAddResult, PC_Out, AndOut);   
   
    ProgramCounter PC(Address, PCResult, Rst, Clk,stall); 
@@ -148,10 +151,14 @@ module DataPath(Rst, Clk,writeData,PCResultO);
 
   macaroniMux macaroniMux1(MMOut, AdderOut, macaroni1out, RS_Out , JSEl,PCAddResultOut[31:28]);//need to send in rs
     
+  Mux32Bit2To1 FORWARDIDA(RS_F, RS, RT_MEM, ForwardA_ID);
+  
+  Mux32Bit2To1 FORWARDIDB(RT_F, RT, RT_MEM, ForwardB_ID);
+    
   BranchComp BranchRes(
        branchRes,
-       RS,
-       RT,
+       RS_F,
+       RT_F,
        ZeroFlag 
         );
         
@@ -210,7 +217,7 @@ module DataPath(Rst, Clk,writeData,PCResultO);
                        
    //EX                             
    //ForwardingUnitEX(RD_MEM,RS_EX,RD_WB,RT_EX,RegWrite_EX,RegWrite_WB,ForwardA,ForwardB,RegWrite_MEM,ForwardA_ID,ForwardB_ID,RT_ID,RS_ID,MemWrite_MEM,Forward_MEM)
-   ForwardingUnitEX FU(RegDest_MEM,Instruction_EX[25:21],RegDest_WB,Instruction_EX[20:16],RegWrite_Out,RegWrite_WB,ForwardA,ForwardB,RegWrite_MEM,ForwardA_ID,ForwardB_ID,InstructionOut[20:16],InstructionOut[25:21],MemWrite_MEM,Forward_MEM);
+   ForwardingUnitEX FU(RegDest_MEM,Instruction_EX[25:21],RegDest_WB,Instruction_EX[20:16],RegWrite_Out,RegWrite_WB,ForwardA,ForwardB,RegWrite_MEM,ForwardA_ID,ForwardB_ID,InstructionOut[20:16],InstructionOut[25:21],MemWrite_MEM,Forward_MEM); //might need to split up so not slow
    
    Mux5Bit2To1 RegDestination(REGDST, RegDest1_Out, RegDest2_Out, RegDst_Out);
    
@@ -254,7 +261,9 @@ module DataPath(Rst, Clk,writeData,PCResultO);
  
 //MEM 
     //need to add 3 to 1 mux 
-    Mux3to1 DATAMEMW(DMWout, RT_MEM, DM_Sel_MEM);
+    Mux32Bit2To1 FORWARD_MEM(RT_MEM_F, RT_MEM, WriteData, Forward_MEM);
+    
+    Mux3to1 DATAMEMW(DMWout, RT_MEM_F, DM_Sel_MEM);
     
     DataMemory DATAMem(ALUResult_MEM[11:0], DMWout, Clk, MemWrite_MEM, MemRead_MEM, ReadData_MEM,DM_Sel_MEM); 
     

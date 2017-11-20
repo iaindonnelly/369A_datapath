@@ -69,7 +69,9 @@ module ForwardingUnitEX(RD_MEM,RS_EX,RD_WB,RT_EX,RegWrite_EX,RegWrite_WB,Forward
     always @(*) begin 
             ForwardA <= 2'b00;
             ForwardB <= 2'b00;
-            
+            ForwardA_ID <= 0;
+            ForwardB_ID <= 0;
+            Forward_MEM <= 0;
           if (RegWrite_EX 
           && (RD_MEM != 0)
           && (RD_MEM == RS_EX)) begin 
