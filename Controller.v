@@ -21,7 +21,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module Controller(OpCode,func,ALUSrc,RegDst,RegWrite,ALUOp,MemRead,MemWrite,MemtoReg,Branch, ShiftOp,Instr,InstrV,Hi_write,Lo_write,immUnsign,branchRT,branchRes,branchSel,DM_Sel,JSEl, ContFlush); 
+module Controller(OpCode,func,ALUSrc,RegDst,RegWrite,ALUOp,MemRead,MemWrite,MemtoReg,Branch, ShiftOp,Instr,InstrV,Hi_write,Lo_write,immUnsign,branchRT,branchRes,branchSel,DM_Sel,JSEl); 
     input Instr;//21st bit
     input InstrV;//7th bit
     input [5:0] OpCode;
@@ -43,7 +43,6 @@ module Controller(OpCode,func,ALUSrc,RegDst,RegWrite,ALUOp,MemRead,MemWrite,Memt
     output reg branchSel;
     output reg [1:0] DM_Sel;
     output reg [1:0] JSEl;
-    output reg ContFlush;
     
     initial begin 
     
@@ -63,7 +62,6 @@ module Controller(OpCode,func,ALUSrc,RegDst,RegWrite,ALUOp,MemRead,MemWrite,Memt
         branchSel <= 0;
         DM_Sel <= 0;
         JSEl <= 0;
-        ContFlush <= 0;;
     end 
     //unsigned
     always@(*) begin //broken
@@ -84,7 +82,6 @@ module Controller(OpCode,func,ALUSrc,RegDst,RegWrite,ALUOp,MemRead,MemWrite,Memt
                  branchSel <= 0;
                  DM_Sel <= 0;
                  JSEl <= 0;
-                 ContFlush <= 0;
         if (OpCode == 0 && func == 6'b100000) begin //add
             ALUOp <= 5'b00000;
             RegWrite <= 1;
@@ -449,7 +446,7 @@ module Controller(OpCode,func,ALUSrc,RegDst,RegWrite,ALUOp,MemRead,MemWrite,Memt
             branchRes <= 3'b110;
             Branch <= 1;
            JSEl <= 1;
-          // ContFlush <= 1;
+           
         end
         else if (OpCode == 6'b000011) begin //JAL /
                                                                         
@@ -458,7 +455,7 @@ module Controller(OpCode,func,ALUSrc,RegDst,RegWrite,ALUOp,MemRead,MemWrite,Memt
             RegWrite <= 1;
             branchSel <= 1;
             JSEl <= 1;
-           // ContFlush <= 1;
+            
             //need to write to register 31
         end  
          else if (OpCode == 6'b000000 && func == 6'b001000) begin //JR /
@@ -466,7 +463,7 @@ module Controller(OpCode,func,ALUSrc,RegDst,RegWrite,ALUOp,MemRead,MemWrite,Memt
            branchRes <= 3'b110;
            Branch <= 1;
            JSEl <= 2;
-          // ContFlush <= 1;
+ 
            //branchSel <= 1;
           
        end  
@@ -480,7 +477,7 @@ module Controller(OpCode,func,ALUSrc,RegDst,RegWrite,ALUOp,MemRead,MemWrite,Memt
              MemtoReg <= 0;
              Branch <= 0;
              ShiftOp <= 0; 
-             ContFlush <= 0;
+            
              end 
         end 
 endmodule

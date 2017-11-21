@@ -107,7 +107,6 @@ module DataPath(Rst, Clk,writeData,PCResultO);
           wire [31:0] Instruction_EX;
           wire FlushID;
           wire FlushIF;
-          wire ContFlush;
           wire IDFlush;
           wire stall;
           wire ForwardA_ID;
@@ -125,7 +124,7 @@ module DataPath(Rst, Clk,writeData,PCResultO);
   //need to stall pcadder
   PCAdder PCA(PCResult, PCAddResult);
   
-  IF_ID_Register IF_ID(Instruction, PCAddResult, Clk, PCAddResultOut, InstructionOut,ContFlush,stall);
+  IF_ID_Register IF_ID(Instruction, PCAddResult, Clk, PCAddResultOut, InstructionOut,AndOut,stall);
   //Decode
   PCAdder JALADD(PCAddResultOut,JALAOut);
   //need to route select signal thorugh mem_wb                    bran
@@ -139,7 +138,7 @@ module DataPath(Rst, Clk,writeData,PCResultO);
   
   ZeroExtension ZE(InstructionOut[15:0], ZeroextOut); 
   
-  Controller Cont(InstructionOut[31:26],InstructionOut[5:0],ALUSrc,RegDst,RegWrite,ALUOp,MemRead,MemWrite,MemtoReg,Branch, ShiftOp,InstructionOut[21],InstructionOut[6],Hi_Write,Lo_Write,immUnsign,InstructionOut[20:16],branchRes,branchSel,DM_Sel_In,JSEl,ContFlush);
+  Controller Cont(InstructionOut[31:26],InstructionOut[5:0],ALUSrc,RegDst,RegWrite,ALUOp,MemRead,MemWrite,MemtoReg,Branch, ShiftOp,InstructionOut[21],InstructionOut[6],Hi_Write,Lo_Write,immUnsign,InstructionOut[20:16],branchRes,branchSel,DM_Sel_In,JSEl);
   // HazardDetection(Instruction,RD_EX,RT_ID,RS_ID,FlushID,FlushIF,stall,MemRead_EX)
   HazardDetection HazardUnit(InstructionOut,REGDST,InstructionOut[25:21], InstructionOut[20:16],FlushID,FlushIF,stall,MemRead_Out); //need to fill in correct values;
   
@@ -162,7 +161,7 @@ module DataPath(Rst, Clk,writeData,PCResultO);
        ZeroFlag 
         );
         
-     OR FLUSHOR(FlushID,ContFlush,IDFlush);
+    // OR FLUSHOR(FlushID,ContFlush,IDFlush);
   
    ID_EX_Register ID_EX( RegWrite, 
                         MemtoReg,
@@ -211,7 +210,7 @@ module DataPath(Rst, Clk,writeData,PCResultO);
                         DM_Sel_Out,
                         ZeroOut,
                         Instruction_EX,
-                        IDFlush
+                        FlushID
                         );
                         
                        
