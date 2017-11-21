@@ -139,8 +139,8 @@ module DataPath(Rst, Clk,writeData,PCResultO);
   ZeroExtension ZE(InstructionOut[15:0], ZeroextOut); 
   
   Controller Cont(InstructionOut[31:26],InstructionOut[5:0],ALUSrc,RegDst,RegWrite,ALUOp,MemRead,MemWrite,MemtoReg,Branch, ShiftOp,InstructionOut[21],InstructionOut[6],Hi_Write,Lo_Write,immUnsign,InstructionOut[20:16],branchRes,branchSel,DM_Sel_In,JSEl);
-  // HazardDetection(Instruction,RD_EX,RT_ID,RS_ID,FlushID,FlushIF,stall,MemRead_EX)
-  HazardDetection HazardUnit(InstructionOut,REGDST,InstructionOut[25:21], InstructionOut[20:16],FlushID,FlushIF,stall,MemRead_Out); //need to fill in correct values;
+  //HazardDetection(Instruction,RD_EX,Branch,RegWrite_EX,MemRead_Mem,RT_ID,RS_ID,FlushID,FlushIF,stall,MemRead_EX);
+  HazardDetection HazardUnit(InstructionOut,REGDST,PCSrc_Out,RegWrite_Out,MemRead_MEM,InstructionOut[25:21], InstructionOut[20:16],FlushID,FlushIF,stall,MemRead_Out); //need to fill in correct values;
   
   ShiftLeft2 SHL2(SignOut,ShiftOut);
      
