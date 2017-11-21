@@ -25,10 +25,13 @@ if (ID/EX.MemRead and
           stall the pipeline
 */
 
-module HazardDetection(Instruction,RD_EX,RT_ID,RS_ID,FlushID,FlushIF,stall,MemRead_EX); //also need ex stage mem control signals
+module HazardDetection(Instruction,RD_EX,Branch,RegWrite_EX,MemRead_Mem,RT_ID,RS_ID,FlushID,FlushIF,stall,MemRead_EX); //also need ex stage mem control signals
     input [31:0] Instruction;
     input [4:0] RD_EX,RT_ID,RS_ID;
     input MemRead_EX;
+    input MemRead_Mem;
+    input Branch;
+    input RegWrite_EX;
     output reg FlushID;
     output reg FlushIF;
     output reg stall;
@@ -41,11 +44,25 @@ module HazardDetection(Instruction,RD_EX,RT_ID,RS_ID,FlushID,FlushIF,stall,MemRe
     FlushID <= 0 ;
     FlushIF <= 0;
     stall <= 0;
-    if (MemRead_EX &&
+    if (MemRead_EX && //load word followed by dependent instruction
        ((RD_EX == RS_ID) ||
-            (RD_EX == RT_ID)) && (RD_EX != 0)) begin 
+        (RD_EX == RT_ID)) && 
+        (RD_EX != 0)) begin 
             stall <= 1;
             end
+    if (RegWrite_EX && Branch && // any instruction which writes to a register followed by dependent branch
+       ((RD_EX == RS_ID) ||
+         (RD_EX == RT_ID)) &&
+         (RD_EX !=0)) begin
+         stall<=1;
+         end
+     if (MemRead_Mem  && // load word followed by dependent branch 2nd stall
+        ((RD_EX == RS_ID) ||
+         (RD_EX == RT_ID)) &&
+         (RD_EX !=0)) begin
+          stall<=1;
+          end   
+    
               
     end
     
