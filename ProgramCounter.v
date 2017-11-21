@@ -29,7 +29,7 @@ module ProgramCounter(Address, PCResult, Reset, Clk,stall);
 
 	input [31:0] Address;
 	input Reset, Clk,stall;
-
+    reg [31:0] PC_Hold;
 	output reg [31:0] PCResult;
         initial begin 
         PCResult <= 0;
@@ -40,9 +40,11 @@ module ProgramCounter(Address, PCResult, Reset, Clk,stall);
             end
             else begin 
                 if(stall) begin //will this work?
+                PCResult  <= PC_Hold;
                 end 
                 else begin 
                 PCResult <= Address;
+                PC_Hold <= Address;
                 end
             end
         end 
