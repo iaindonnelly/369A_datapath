@@ -176,7 +176,7 @@ module ALU32Bit(ALUControl, A, B, ALUResult, Zero,shamt,Hi,Hi_in,Lo_in); //lo,of
                      ALUResult = C[31:0]; 
                      
          end
-         else if(ALUControl == 5'b11001) begin 
+         else if(ALUControl == 5'b11001) begin //lui
                     ALUResult = (B << 16);           
                     //might need to use zeros
         end

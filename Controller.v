@@ -395,7 +395,7 @@ module Controller(OpCode,func,ALUSrc,RegDst,RegWrite,ALUOp,MemRead,MemWrite,Memt
             MemWrite <= 1;
             DM_Sel <= 1;
        end 
-       else if (OpCode == 6'b001111) begin //lui wont work
+       else if (OpCode == 6'b001111) begin //lui
                                                                
                ALUOp <= 5'b11001; //new op
                ALUSrc <= 1;

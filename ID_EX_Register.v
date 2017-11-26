@@ -99,9 +99,11 @@ module ID_EX_Register( RegWrite_In,
                     //   Instruction_Out,
                        Zero_Out,
                        Instruction_Out,
-                       Flush);
+                       Flush,
+                       Rst);
         //               JSEl_Out);
-       //WB Stage Signals                
+       //WB Stage Signals       
+       input Rst;       
        input RegWrite_In;                
        input MemToReg_In;
        input Flush;
@@ -197,7 +199,7 @@ module ID_EX_Register( RegWrite_In,
        
         
        always@(posedge Clk)begin
-       if (Flush == 1) begin
+       if (Flush == 1 || Rst == 1) begin
        Instruction_Out <= 0;
           ALUSrc_Out <= 0; 
           RegDst_Out <= 0; 

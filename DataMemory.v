@@ -48,16 +48,25 @@ module DataMemory(Address, WriteData, Clk, MemWrite, MemRead, ReadData,DM_SEL);
     reg [31:0] memory [0:1023]; // main Data memory 1K of 32 bit wide elements
       
     initial begin 
-        for(i =6; i < 1024; i = i+1) begin
+        for(i =12; i < 1024; i = i+1) begin
         memory[i] <= 0;
         end
-        memory[0] <= 32'd0;
-        memory[1] <= 32'd1;
-        memory[2] <= 32'd2;
-        memory[3] <= 32'd3;
-        memory[4] <= 32'd4;
-        memory[5] <= -32'd1;
+        //0, 1, 2, 3, 4 , -1
+       
+        memory[0] <= 32'd100;
+        memory[1] <= 32'd200;
+        memory[2] <= 32'd300;
+        memory[3] <= 32'd400;
+        memory[4] <= 32'd500;
+        memory[5] <= 32'd600;
         
+        memory[6] <= 32'd700;
+        memory[7] <= 32'd800;
+        memory[8] <= 32'd900;
+        memory[9] <= 32'd1000;
+        memory[10] <= 32'd1100;
+        memory[11] <= 32'd1200;
+              
     end
     always @(posedge Clk) begin
             if (MemWrite == 1'b1) begin         //checks for Memory Write signal from controller

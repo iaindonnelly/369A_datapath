@@ -61,10 +61,12 @@ module MEM_WB_Register( RegWrite_In,
                        DataMem_Out,
                        ALUResult_Out,
                        RegDest_Out,
-                       branchSel_Out
+                       branchSel_Out,
+                       Rst
                        );
                        
-       //WB Stage Signals                
+       //WB Stage Signals 
+       input Rst;               
        input RegWrite_In;                
        input MemToReg_In;
       input branchSel_In;
@@ -96,13 +98,23 @@ module MEM_WB_Register( RegWrite_In,
        
        
        always@(posedge Clk)begin
+       if(Rst) begin
+       DataMem_Out <= 0 ;
+       ALUResult_Out <= 0;
+       RegDest_Out <= 0;
+       RegWrite_Out <= 0; 
+       MemToReg_Out <= 0; 
+       branchSel_Out <= 0;
+           end
+       else begin
+       
        branchSel_Out <= branchSel_In;
        RegWrite_Out <= RegWrite_In;
        MemToReg_Out <= MemToReg_In;
        DataMem_Out <= DataMem_In;
        ALUResult_Out <= ALUResult_In;
        RegDest_Out <= RegDest_In;
-           
+       end    
        end
 
 endmodule

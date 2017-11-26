@@ -49,12 +49,12 @@
 // to allow for data multiplexing and setup time.
 ////////////////////////////////////////////////////////////////////////////////
 
-module RegisterFile(ReadRegister1, ReadRegister2, WriteRegister, WriteData, RegWrite, Clk, ReadData1, ReadData2);
+module RegisterFile(ReadRegister1, ReadRegister2, WriteRegister, WriteData, RegWrite, Clk, ReadData1, ReadData2,Rst);
        input [4:0]ReadRegister1;
        input [4:0]ReadRegister2;
        input [4:0]WriteRegister;
        input RegWrite;
-       input Clk;
+       input Clk,Rst;
        input [31:0]WriteData;
        reg [31:0] regFile [0:31] ;
        output reg [31:0]ReadData1;
@@ -69,16 +69,25 @@ module RegisterFile(ReadRegister1, ReadRegister2, WriteRegister, WriteData, RegW
           ReadData2 <= 0;
        end 
        
-       always@(posedge Clk)begin
+       always@(negedge Clk)begin //posedge
+       if(Rst) begin 
+       for(i = 0; i < 32;i=i+1) begin
+                    regFile[i] <= 0;
+           end  
+       end
+       else begin
        if (RegWrite == 1 && WriteRegister != 0) begin 
             regFile[WriteRegister] <= WriteData;
        end 
        end
+       end
  
-       always@(negedge Clk)begin 
+       always@(*)begin //
+            
              
                   ReadData1 <= regFile[ReadRegister1];
                   ReadData2 <= regFile[ReadRegister2];
+            
               
        end
 

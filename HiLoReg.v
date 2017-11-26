@@ -22,10 +22,10 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module HiLoReg( WriteHi, WriteLo, Clk, ReadData1, ReadData2, WriteData1,WriteData2);
+module HiLoReg( WriteHi, WriteLo, Clk, ReadData1, ReadData2, WriteData1,WriteData2,Rst);
        input WriteHi;
        input WriteLo;
-       input Clk;
+       input Clk,Rst;
        input [31:0] WriteData1;
        input [31:0] WriteData2;
        output reg [31:0] ReadData1;
@@ -38,12 +38,18 @@ module HiLoReg( WriteHi, WriteLo, Clk, ReadData1, ReadData2, WriteData1,WriteDat
            Lo <= 0;
        end 
        always@(negedge Clk)begin
+       if (Rst) begin
+       Hi <=0;
+       Lo <= 0;
+       end
+       else begin
        if (WriteHi == 1) begin 
              Hi <= WriteData1;
        end
        if (WriteLo == 1 ) begin 
              Lo <= WriteData2;
        end  
+       end
        end 
        
        always@(posedge Clk)begin 
